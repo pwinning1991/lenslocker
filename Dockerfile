@@ -1,4 +1,4 @@
-FROM golang:1.19:alpine
+FROM golang:1.19.1-alpine3.16
 
 USER app
 
