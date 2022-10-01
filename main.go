@@ -55,6 +55,6 @@ func main() {
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "page not found", http.StatusNotFound)
 	})
-	fmt.Println("Starting the server on :30000")
+	fmt.Println("Starting the server on :3000")
 	http.ListenAndServe("0.0.0.0:3000", r)
 }
