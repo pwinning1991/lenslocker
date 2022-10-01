@@ -11,6 +11,8 @@ RUN go mod download
 
 COPY *.go ./
 
+EXPOSE 3000
+
 RUN go build -o /lenslocker
 
 CMD ["/lenlocker"]
