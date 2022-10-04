@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY go.mod ./
 COPY go.sum ./
+COPY controllers templates views ./
 
 RUN go mod download
 
