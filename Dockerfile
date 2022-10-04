@@ -4,7 +4,7 @@ COPY . ./
 RUN go mod download
 RUN go build -o /lenslocker
 
-FROM alpine:3.11.3
+FROM alpine:3.16.2
 COPY --from=builder lenslocker .
 EXPOSE 3000
 CMD ["/lenslocker"]
