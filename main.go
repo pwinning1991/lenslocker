@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/pwinning1991/lenslocker/controllers"
 	"github.com/pwinning1991/lenslocker/templates"
 	"github.com/pwinning1991/lenslocker/views"
@@ -14,6 +15,8 @@ import (
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	//TODO maybe look at moving this to the controllers somehow
+	r.Get("/metrics", promhttp.Handler().ServeHTTP)
 	tpl := views.Must(views.ParseFS(templates.FS, "home.gohtml", "tailwind.gohtml"))
 	r.Get("/", controllers.StaticHandler(tpl))
 	tpl = views.Must(views.ParseFS(templates.FS, "contact.gohtml", "tailwind.gohtml"))
@@ -23,6 +26,7 @@ func main() {
 	usersC := controllers.Users{}
 	usersC.Templates.New = views.Must(views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"))
 	r.Get("/signup", usersC.New)
+	r.Post("/users", usersC.Create)
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "page not found", http.StatusNotFound)
 	})
