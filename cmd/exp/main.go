@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	db, err := sql.Open("pgx", "host=localhost port=5432 user=baloo password=philip1991 dbname=lenlockded sslmode=disable")
+	db, err := sql.Open("pgx", "host=localhost port=5432 user=baloo password=philip1991 dbname=lenslocked sslmode=disable")
 	if err != nil {
 		panic(err)
 	}
