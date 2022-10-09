@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/pwinning1991/lenslocker/models"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -23,7 +24,16 @@ func main() {
 	r.Get("/contact", controllers.StaticHandler(tpl))
 	tpl = views.Must(views.ParseFS(templates.FS, "faq.gohtml", "tailwind.gohtml"))
 	r.Get("/faq", controllers.FAQ(tpl))
-	usersC := controllers.Users{}
+	cfg := models.DefaultPostgresConfig()
+	db, err := models.Open(cfg)
+	if err != nil {
+		panic(err) //TODO handle this error better
+	}
+	defer db.Close()
+	userService := models.UserService{db}
+	usersC := controllers.Users{
+		UserService: &userService, //TODO set this
+	}
 	usersC.Templates.New = views.Must(views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"))
 	r.Get("/signup", usersC.New)
 	r.Post("/users", usersC.Create)
