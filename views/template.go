@@ -1,9 +1,11 @@
 package views
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/gorilla/csrf"
 	"html/template"
+	"io"
 	"io/fs"
 	"log"
 	"net/http"
@@ -20,8 +22,8 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 	tpl := template.New(patterns[0])
 	tpl.Funcs(
 		template.FuncMap{
-			"csrfField": func() template.HTML {
-				return `<!-- TODO: Implement the csrField -->`
+			"csrfField": func() (template.HTML, error) {
+				return "", fmt.Errorf("csrfField not iumplemented")
 			},
 		},
 	)
@@ -53,10 +55,12 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface
 		},
 	)
 	w.Header().Set("Content-Type", "text/html")
-	err = tpl.Execute(w, data)
+	var buf bytes.Buffer
+	err = tpl.Execute(&buf, data)
 	if err != nil {
 		log.Printf("error rendering the template: %v", err)
 		http.Error(w, "there was an error rendering the template", http.StatusInternalServerError)
 		return
 	}
+	io.Copy(w, &buf)
 }
