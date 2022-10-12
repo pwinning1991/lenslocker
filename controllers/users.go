@@ -2,9 +2,7 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/gorilla/csrf"
 	"github.com/pwinning1991/lenslocker/models"
-	"html/template"
 	"net/http"
 )
 
@@ -18,12 +16,10 @@ type Users struct {
 
 func (u Users) New(w http.ResponseWriter, r *http.Request) {
 	var data struct {
-		Email     string
-		CSRFField template.HTML
+		Email string
 	}
 	data.Email = r.FormValue("email")
-	data.CSRFField = csrf.TemplateField(r)
-	u.Templates.New.Execute(w, data)
+	u.Templates.New.Execute(w, r, data)
 }
 
 func (u Users) Create(w http.ResponseWriter, r *http.Request) {
@@ -48,7 +44,7 @@ func (u Users) SignIn(w http.ResponseWriter, r *http.Request) {
 		Email string
 	}
 	data.Email = r.FormValue("email")
-	u.Templates.SignIn.Execute(w, data)
+	u.Templates.SignIn.Execute(w, r, data)
 }
 
 func (u Users) ProcessSignIn(w http.ResponseWriter, r *http.Request) {

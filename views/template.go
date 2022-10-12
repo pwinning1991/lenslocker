@@ -2,6 +2,7 @@ package views
 
 import (
 	"fmt"
+	"github.com/gorilla/csrf"
 	"html/template"
 	"io/fs"
 	"log"
@@ -20,7 +21,7 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 	tpl.Funcs(
 		template.FuncMap{
 			"csrfField": func() template.HTML {
-				return `<input type="hidden" />`
+				return `<!-- TODO: Implement the csrField -->`
 			},
 		},
 	)
@@ -34,29 +35,24 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 	}, nil
 }
 
-//func Parse(filepath string) (Template, error) {
-//	tpl, err := template.ParseFiles(filepath)
-//	if err != nil {
-//		return Template{}, fmt.Errorf("parsing template: %w", err)
-//	}
-//
-//	return Template{
-//		htmlTpl: tpl,
-//	}, nil
-//
-//}
-
 type Template struct {
 	htmlTpl *template.Template
 }
 
-func (t Template) Execute(w http.ResponseWriter, data interface{}) {
+func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface{}) {
+	tpl := t.htmlTpl
+	tpl = tpl.Funcs(
+		template.FuncMap{
+			"csrfField": func() template.HTML {
+				return csrf.TemplateField(r)
+			},
+		},
+	)
 	w.Header().Set("Content-Type", "text/html")
-	err := t.htmlTpl.Execute(w, data)
+	err := tpl.Execute(w, data)
 	if err != nil {
 		log.Printf("error rendering the template: %v", err)
 		http.Error(w, "there was an error rendering the template", http.StatusInternalServerError)
 		return
 	}
-
 }
