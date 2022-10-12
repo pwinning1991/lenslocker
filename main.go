@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/gorilla/csrf"
 	"github.com/pwinning1991/lenslocker/models"
 	"net/http"
 
@@ -51,5 +52,10 @@ func main() {
 		http.Error(w, "page not found", http.StatusNotFound)
 	})
 	fmt.Println("Starting the server on :3000")
-	http.ListenAndServe("0.0.0.0:3000", r)
+	csrfKey := "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
+	csrfMW := csrf.Protect(
+		[]byte(csrfKey),
+		//TODO Fix this before deploying
+		csrf.Secure(false))
+	http.ListenAndServe("0.0.0.0:3000", csrfMW(r))
 }
