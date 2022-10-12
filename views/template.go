@@ -63,4 +63,9 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface
 		return
 	}
 	io.Copy(w, &buf)
+	if err != nil {
+		log.Printf("error rendering the template: %v", err)
+		http.Error(w, "there was an error rendering the template", http.StatusInternalServerError)
+		return
+	}
 }
