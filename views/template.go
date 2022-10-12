@@ -40,7 +40,11 @@ type Template struct {
 }
 
 func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface{}) {
-	tpl := t.htmlTpl
+	tpl, err := t.htmlTpl.Clone()
+	if err != nil {
+		log.Printf("cloning template: %v", err)
+		http.Error(w, "There was an error rendering the page", http.StatusInternalServerError)
+	}
 	tpl = tpl.Funcs(
 		template.FuncMap{
 			"csrfField": func() template.HTML {
@@ -49,7 +53,7 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface
 		},
 	)
 	w.Header().Set("Content-Type", "text/html")
-	err := tpl.Execute(w, data)
+	err = tpl.Execute(w, data)
 	if err != nil {
 		log.Printf("error rendering the template: %v", err)
 		http.Error(w, "there was an error rendering the template", http.StatusInternalServerError)
